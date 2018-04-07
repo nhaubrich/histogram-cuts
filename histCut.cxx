@@ -6,12 +6,18 @@ void histCut(){
 	TTree *Events = (TTree*) gluHAAbbTauTau->Get("Events");	
 
 	//pdgId of A is 36, H is 25, b is +-5
+	
 
 	//pT(A)
-	TH1F *ptA = new TH1F("ptA","pt(A)",100,0,100);
+	TH2F *ptA = new TH2F("ptA","pt(A)",10,0,100,10,0,100);
 	ptA->SetCanExtend(TH1::kXaxis);
-	Events->Draw("GenPart_pt >> ptA","GenPart_pdgId == 36");
-
-
-
+	//Events->Draw("GenPart_pt >> ptA","GenPart_pdgId == 36");
+	ptA->Fill(35,65,100);
+	//ptA->Draw("COL");
+	TCanvas *c[10];
+	for(int i=0;i<10;++i){
+		c[i] = new TCanvas(Form("c%d",i));
+		c[i]->cd();
+		ptA->Draw("COL");
+	}
 }
