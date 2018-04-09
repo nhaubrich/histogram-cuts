@@ -10,9 +10,13 @@
 #include <math.h>
 #include <iostream>
 #include <sstream>
+
 using namespace std;
 float dR(float dEta1,float dPhi1,float dEta2,float dPhi2 ) {
-   return sqrt((dEta1-dEta2)*(dEta1-dEta2)+(dPhi1-dPhi2)*(dPhi1-dPhi2));
+	float dEta = abs(dEta1-dEta2);
+	float dPhi = abs(dPhi1-dPhi2);	
+	while(dPhi > M_PI) dPhi=dPhi-M_PI;
+	return sqrt(dEta*dEta + dPhi*dPhi);
 }
 void treeCut(){
 
@@ -21,18 +25,18 @@ void treeCut(){
 
 	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",10,0,100,10,0,100);	
 	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",10,0,100,10,0,100);	
-	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",10,0,200,10,0,10);
+	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",20,0,120,16,0,8);
 	TH1F* ptA = new TH1F("ptA","pt(A)",100,0,200);
 		
-	TH2F* dRAAptH = new TH2F("dRAAptH","dR(AA) vs pt(H)",10,0,200,10,0,10);
-	TH1F* ptH = new TH1F("ptH","pt(H)",100,0,200);
+	TH2F* dRAAptH = new TH2F("dRAAptH","dR(AA) vs pt(H)",40,0,200,40,0,10);
+	//TH1F* ptH = new TH1F("ptH","pt(H)",100,0,200);
 	TH2F* ptAhighptH =new TH2F("ptAhighptH","pt(A) high vs pt(H)",10,0,100,10,0,100); 
-	TH2F* ptAlowptH = new TH2F("ptAlowptH","pt(A) low vs pt(H)",10,0,100,10,0,100);
+	TH2F* ptAlowptH = new TH2F("ptAlowptH","pt(A) low vs pt(H)",20,0,100,20,0,80);
 	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",10,0,200,10,0,200);
-	TH1F* mH = new TH1F("mH","Higgs mass",16,123.5,126.5);
+	TH1F* mH = new TH1F("mH","Higgs mass",12,123,126);
 	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",100,0,500);
 	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",100,0,500);
-	TH1F* Vmass = new TH1F("Vmass","VB mass",500,0,250);
+	TH1F* Vmass = new TH1F("Vmass","VB mass",200,50,150);
 
 	TChain *chain = new TChain("Events");
         chain->Add("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/*.root");
@@ -50,7 +54,7 @@ void treeCut(){
 	unsigned int max_nGenPart = 200;
 	ostringstream max_nGenPart_str;
 	max_nGenPart_str << max_nGenPart;	
-	unsigned int nGenPart;
+	unsigned int nGenPart= 0;
 	float GenPart_pt[max_nGenPart];
 	int GenPart_pdgId[max_nGenPart];		
 	float GenPart_mass[max_nGenPart];
@@ -68,7 +72,7 @@ void treeCut(){
 
 	int nevents = chain->GetEntries();
 	int check = nevents/100;	
-	//nevents = 10;//FOR TESTING
+//	nevents = 10;//FOR TESTING
 	cout << "Running with " << nevents << " events." << endl;	
 	for(int i=0;i<nevents;++i){ //LOOP OVER EVENTS
 		//cout << "Entry: " << i << endl;
@@ -127,18 +131,14 @@ void treeCut(){
 						foundAbb = true;
 					}
 					else throw std::runtime_error("Multiple A->bb decays in one event");
-				}
-				
-							
-				
-					
+				}							
 			}
 	
 			//FOR VECTOR-HIGGS
 			//check event starts with 2 quarks (1-6)
 			//look for a(25) -> tau tau (+-15)
-			//25GeV Higgs (35)
-			//'A' mass is 15
+			//125GeV Higgs (35)
+			//'A' mass is 15GeV
 			if(vectorHiggs){
 				//Get index of As
 				if(GenPart_pdgId[j] == 25){
@@ -160,11 +160,30 @@ void treeCut(){
 			
 		//fill all A-dependent plots in here
 		if(foundAA){
+			//Get index of mama H, making sure it's H
+			if(GenPart_genPartIdxMother[a_index[0]] == GenPart_genPartIdxMother[a_index[1]]){
+				if(gluonFusion && GenPart_pdgId[GenPart_genPartIdxMother[a_index[0]]]==25) H_index = GenPart_genPartIdxMother[a_index[0]];
+				else if(vectorHiggs && GenPart_pdgId[GenPart_genPartIdxMother[a_index[0]]]==35) H_index = GenPart_genPartIdxMother[a_index[0]];
+				
+				else{		
+					cout << GenPart_genPartIdxMother[a_index[0]] << endl; 
+					throw std::runtime_error("A mother not Higgs");
+				}
+			}
+			else throw std::runtime_error("A parents don't match ");
+			
+
+	
+					
+			//Get index of mama A
+			if(GenPart_genPartIdxMother[b_index[0]] == GenPart_genPartIdxMother[b_index[1]]) aMother_index = GenPart_genPartIdxMother[b_index[0]];
+			else throw std::runtime_error("bb parents don't match");
 
 			H_pt = GenPart_pt[H_index];				
 			H_mass = GenPart_mass[H_index];
-			mH->Fill(H_mass);
 			dRAA = dR(GenPart_eta[a_index[0]],GenPart_phi[a_index[0]],GenPart_eta[a_index[1]],GenPart_phi[a_index[1]]);
+			
+			mH->Fill(H_mass);
 			dRAAptH->Fill(H_pt,dRAA);
 
 			if(GenPart_pt[a_index[0]] >= GenPart_pt[a_index[1]]){
@@ -179,17 +198,7 @@ void treeCut(){
 			//fill pt(A) with both As
 			ptA->Fill(GenPart_pt[a_index[0]]);
 			ptA->Fill(GenPart_pt[a_index[1]]);
-			//Get index of mama H
-			if(GenPart_genPartIdxMother[a_index[0]] == GenPart_genPartIdxMother[a_index[1]]) H_index = GenPart_genPartIdxMother[a_index[0]];
-			else throw std::runtime_error("A parents don't match ");
-			
-
-	
-					
-			//Get index of mama A
-			if(GenPart_genPartIdxMother[b_index[0]] == GenPart_genPartIdxMother[b_index[1]]) aMother_index = GenPart_genPartIdxMother[b_index[0]];
-			else throw std::runtime_error("bb parents don't match");
-			aMother_pt = GenPart_pt[aMother_index];
+					aMother_pt = GenPart_pt[aMother_index];
 			
 			//Fill gluon fusion-specific plots
 			if(gluonFusion){
@@ -236,7 +245,7 @@ void treeCut(){
 	
 	}	
 		
-	int nHist = 9; //Make canvases
+	int nHist = 12; //Make canvases
 	TCanvas *c[nHist];
 	for(int i=0;i<nHist;i++){
 		c[i] = new TCanvas(Form("c%d",i));
@@ -244,23 +253,48 @@ void treeCut(){
 
 	c[0]->cd();
 	ptAhighptH->Draw("COL");
+	ptAhighptH->GetXaxis()->SetTitle("pt(H)");
+	ptAhighptH->GetYaxis()->SetTitle("pt(A)");
+	c[0]->Modified();
 	c[1]->cd();
 	ptAlowptH->Draw("COL");
+	ptAlowptH->GetXaxis()->SetTitle("pt(H)");
+	ptAlowptH->GetYaxis()->SetTitle("pt(A)");
+	c[1]->Modified();
 	c[2]->cd();
 	dRAAptH->Draw("COL");	
+	dRAAptH->GetXaxis()->SetTitle("pt(H)");
+	dRAAptH->GetYaxis()->SetTitle("dR(AA)");
+	c[2]->Modified();
 	c[3]->cd();
 	dRbbptA->Draw("COL");
+	dRbbptA->GetXaxis()->SetTitle("pt(A)");
+	dRbbptA->GetYaxis()->SetTitle("dR(bb)");
+	c[3]->Modified();
 	c[4]->cd();
 	ptbhighptA->Draw("COL");
+	ptbhighptA->GetXaxis()->SetTitle("pt(A)");
+	ptbhighptA->GetYaxis()->SetTitle("pt(b)");
+	c[4]->Modified();	
 	c[5]->cd();
 	ptblowptA->Draw("COL");
+	ptblowptA->GetXaxis()->SetTitle("pt(A)");
+	ptblowptA->GetYaxis()->SetTitle("pt(b)");
+	c[5]->Modified();
 	c[6]->cd();
 	mH->Draw();
 	c[7]->cd();
 	VHptH->Draw();
 	c[8]->cd();
 	ptVptH->Draw("COL");
+	ptVptH->GetXaxis()->SetTitle("pt(H)");
+	ptVptH->GetYaxis()->SetTitle("pt(V)");
+	c[8]->Modified();
+	c[9]->cd();
+	ggptH->Draw();
+	c[10]->cd();
+	VHptH->Draw();
+	c[11]->cd();
+	Vmass->Draw();	
+	
 }
-
-
-
