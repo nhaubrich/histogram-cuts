@@ -24,17 +24,17 @@ void treeCut(){
 	//TFile *f = new TFile("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/BBTauTau_0001.root");
 	//TTree* tree = (TTree*)f->Get("Events");
 
-	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",50,0,100,50,0,100);
-	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",50,0,100,50,0,100);	
-	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",60,0,120,60,0,3);
+	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",100,0,100,100,0,100);
+	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",100,0,100,100,0,100);	
+	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",120,0,120,120,0,3);
 	TH1F* ptA = new TH1F("ptA","pt(A)",200,0,200);	
-	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",100,0,200,60,0,3);
-	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",100,0,200,60,0,3);
-	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",50,0,100,50,0,100); 
-	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",50,0,100,50,0,100);
-	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",50,0,100,50,0,100); 
-	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",50,0,100,50,0,100);
-	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",100,0,200,100,0,200);
+	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",200,0,200,120,0,3);
+	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",100,0,200,90,0,3);
+	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",100,0,100,100,0,100); 
+	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",100,0,100,100,0,100);
+	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",100,0,100,100,0,100); 
+	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",100,0,100,100,0,100);
+	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",200,0,200,200,0,200);
 	TH1F* mH = new TH1F("mH","Higgs mass",24,123.5,126.5);
 	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",200,0,500);
 	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",200,0,500);
