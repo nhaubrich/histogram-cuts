@@ -10,6 +10,7 @@
 #include <math.h>
 #include <iostream>
 #include <sstream>
+#include "TProfile.h"
 
 using namespace std;
 float dR(float dEta1,float dPhi1,float dEta2,float dPhi2 ) {
@@ -23,27 +24,25 @@ void treeCut(){
 	//TFile *f = new TFile("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/BBTauTau_0001.root");
 	//TTree* tree = (TTree*)f->Get("Events");
 
-	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",10,0,100,10,0,100);
-	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",10,0,100,10,0,100);	
-	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",20,0,120,16,0,8);
-	TH1F* ptA = new TH1F("ptA","pt(A)",100,0,200);	
-	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",20,0,200,10,0,10);
-	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",20,0,200,10,0,10);
-	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",10,0,100,10,0,100); 
-	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",10,0,100,10,0,100);
-	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",10,0,100,10,0,100); 
-	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",10,0,100,10,0,100);
-	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",20,0,200,20,0,200);
-	TH1F* mH = new TH1F("mH","Higgs mass",12,123,126);
-	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",100,0,500);
-	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",100,0,500);
+	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",50,0,100,50,0,100);
+	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",50,0,100,50,0,100);	
+	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",60,0,120,60,0,3);
+	TH1F* ptA = new TH1F("ptA","pt(A)",200,0,200);	
+	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",100,0,200,60,0,3);
+	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",100,0,200,60,0,3);
+	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",50,0,100,50,0,100); 
+	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",50,0,100,50,0,100);
+	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",50,0,100,50,0,100); 
+	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",50,0,100,50,0,100);
+	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",100,0,200,100,0,200);
+	TH1F* mH = new TH1F("mH","Higgs mass",24,123.5,126.5);
+	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",200,0,500);
+	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",200,0,500);
 	TH1F* Vmass = new TH1F("Vmass","VB mass",200,50,150);
 
 	TChain *chain = new TChain("Events");
         chain->Add("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/*.root");
-
         chain->Add("SUSYGluGluToHToAA_AToMuMu_AToBB_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/*.root");
-
         chain->Add("SUSYVH_HToAA_AToTauTau_M-15_TuneCUETP8M1_13TeV_pythia8/*.root");
 
 	
@@ -73,7 +72,7 @@ void treeCut(){
 
 	int nevents = chain->GetEntries();
 	int check = nevents/100;	
-//	nevents = 10;//FOR TESTING
+	//nevents = 1000;//FOR TESTING
 	cout << "Running with " << nevents << " events." << endl;	
 	for(int i=0;i<nevents;++i){ //LOOP OVER EVENTS
 		//cout << "Entry: " << i << endl;
@@ -259,71 +258,48 @@ void treeCut(){
 		}
 	
 	}	
-		
-	int nHist = 15; //Make canvases
-	TCanvas *c[nHist];
-	for(int i=0;i<nHist;i++){
-		c[i] = new TCanvas(Form("c%d",i));
-	}
 
-	c[0]->cd();
-	ptAhighptH30->Draw("COL");
+	//manually set axes titles (ugh)
 	ptAhighptH30->GetXaxis()->SetTitle("pt(H)");
 	ptAhighptH30->GetYaxis()->SetTitle("pt(A)");
-	c[0]->Modified();	
-	c[1]->cd();
-	ptAlowptH30->Draw("COL");
 	ptAlowptH30->GetXaxis()->SetTitle("pt(H)");
 	ptAlowptH30->GetYaxis()->SetTitle("pt(A)");
-	c[1]->Modified();
-	c[2]->cd();
-	ptAhighptH15->Draw("COL");
 	ptAhighptH15->GetXaxis()->SetTitle("pt(H)");
 	ptAhighptH15->GetYaxis()->SetTitle("pt(A)");
-	c[2]->Modified();	
-	c[3]->cd();
-	ptAlowptH15->Draw("COL");
 	ptAlowptH15->GetXaxis()->SetTitle("pt(H)");
 	ptAlowptH15->GetYaxis()->SetTitle("pt(A)");
-	c[3]->Modified();
-	c[4]->cd();
-	dRAAptH15->Draw("COL");	
 	dRAAptH15->GetXaxis()->SetTitle("pt(H)");
 	dRAAptH15->GetYaxis()->SetTitle("dR(AA)");
-	c[4]->Modified();
-	c[5]->cd();
-	dRAAptH30->Draw("COL");	
 	dRAAptH30->GetXaxis()->SetTitle("pt(H)");
 	dRAAptH30->GetYaxis()->SetTitle("dR(AA)");
-	c[5]->Modified();
-	c[6]->cd();
-	dRbbptA->Draw("COL");
 	dRbbptA->GetXaxis()->SetTitle("pt(A)");
 	dRbbptA->GetYaxis()->SetTitle("dR(bb)");
-	c[6]->Modified();
-	c[7]->cd();
-	ptbhighptA->Draw("COL");
 	ptbhighptA->GetXaxis()->SetTitle("pt(A)");
 	ptbhighptA->GetYaxis()->SetTitle("pt(b)");
-	c[7]->Modified();	
-	c[8]->cd();
-	ptblowptA->Draw("COL");
 	ptblowptA->GetXaxis()->SetTitle("pt(A)");
 	ptblowptA->GetYaxis()->SetTitle("pt(b)");
-	c[8]->Modified();
-	c[9]->cd();
-	mH->Draw();
-	c[10]->cd();
-	VHptH->Draw();
-	c[11]->cd();
-	ptVptH->Draw("COL");
 	ptVptH->GetXaxis()->SetTitle("pt(H)");
-	ptVptH->GetYaxis()->SetTitle("pt(V)");
-	c[11]->Modified();
-	c[12]->cd();
-	ggptH->Draw();
-	c[13]->cd();
-	Vmass->Draw();	
-	c[14]->cd();
-	ptA->Draw();	
+	ptVptH->GetYaxis()->SetTitle("pt(V)");	
+	
+
+	int nHist = 15; //Make canvases
+	
+	TCanvas *c[nHist];	
+	TProfile *prof[10];
+
+	
+	TH1F* h_1d[5] = {ptA, mH, ggptH, VHptH, Vmass};
+	TH2F* h_2d[10] = {ptbhighptA,ptblowptA,dRbbptA,dRAAptH30,dRAAptH15,ptAhighptH30,ptAlowptH30,ptAhighptH15,ptAlowptH15,ptVptH};
+	for(int i=0;i<nHist;++i){
+		c[i] = new TCanvas(Form("c%d",i));
+		c[i]->cd();
+		if(i<10){
+			h_2d[i]->Draw("COL");
+			prof[i] = h_2d[i]->ProfileX();
+			prof[i]->SetErrorOption("S");
+			prof[i]->Draw("ep same");
+		}
+		if(i>=10) h_1d[i-10]->Draw();	
+	}
+
 }
