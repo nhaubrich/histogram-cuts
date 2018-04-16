@@ -11,12 +11,13 @@
 #include <iostream>
 #include <sstream>
 #include "TProfile.h"
+#include "TLine.h"
 
 using namespace std;
 float dR(float dEta1,float dPhi1,float dEta2,float dPhi2 ) {
 	float dEta = abs(dEta1-dEta2);
 	float dPhi = abs(dPhi1-dPhi2);	
-	while(dPhi > M_PI) dPhi=dPhi-M_PI;
+	if(dPhi > M_PI) dPhi= 2*M_PI - dPhi;
 	return sqrt(dEta*dEta + dPhi*dPhi);
 }
 void treeCut(){
@@ -28,17 +29,18 @@ void treeCut(){
 	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",100,0,100,100,0,100);	
 	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",120,0,120,120,0,3);
 	TH1F* ptA = new TH1F("ptA","pt(A)",200,0,200);	
-	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",200,0,200,120,0,3);
-	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",100,0,200,90,0,3);
-	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",100,0,100,100,0,100); 
-	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",100,0,100,100,0,100);
-	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",100,0,100,100,0,100); 
-	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",100,0,100,100,0,100);
-	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",200,0,200,200,0,200);
-	TH1F* mH = new TH1F("mH","Higgs mass",24,123.5,126.5);
-	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",200,0,500);
-	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",200,0,500);
+	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",200,0,300,120,0,5);
+	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",200,0,300,120,0,5);
+	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",200,0,300,200,0,200); 
+	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",200,0,300,200,0,200);
+	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",200,0,300,200,0,200); 
+	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",200,0,300,200,0,200);
+	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",150,0,300,150,0,300);
+	TH1F* mH = new TH1F("mH","Higgs mass",300,123.5,126.5);
+	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",300,0,300);
+	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",300,0,300);
 	TH1F* Vmass = new TH1F("Vmass","VB mass",200,50,150);
+
 
 	TChain *chain = new TChain("Events");
         chain->Add("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/*.root");
@@ -46,8 +48,6 @@ void treeCut(){
         chain->Add("SUSYVH_HToAA_AToTauTau_M-15_TuneCUETP8M1_13TeV_pythia8/*.root");
 
 	
-	
-
 	//pdgId of A is 36, H is 25, b is +-5 for GluGlu files
         //VH has A=h=25, H = 35
 	
@@ -72,6 +72,8 @@ void treeCut(){
 
 	int nevents = chain->GetEntries();
 	int check = nevents/100;	
+	double step = (double) 1/nevents;
+	
 	//nevents = 1000;//FOR TESTING
 	cout << "Running with " << nevents << " events." << endl;	
 	for(int i=0;i<nevents;++i){ //LOOP OVER EVENTS
@@ -234,7 +236,7 @@ void treeCut(){
 				if(vectorHiggs)  throw std::runtime_error("There was a VH A->bb event (vb data incompatable since  mA=15 not mA=30)");
 				dRbb = dR(GenPart_eta[b_index[0]],GenPart_phi[b_index[0]],GenPart_eta[b_index[1]],GenPart_phi[b_index[1]]);
 				dRbbptA->Fill(aMother_pt,dRbb);
-				if(GenPart_pt[b_index[0]] >= GenPart_pt[b_index[0]]){
+				if(GenPart_pt[b_index[0]] >= GenPart_pt[b_index[1]]){
 					ptbhighptA->Fill(aMother_pt,GenPart_pt[b_index[0]]);
 					ptblowptA->Fill(aMother_pt,GenPart_pt[b_index[1]]);
 				}
@@ -251,7 +253,6 @@ void treeCut(){
 
 		
 		//Display progress
-		double step = (double) 1/nevents;
 		if( i %check  == 0){	
 			cout <<"\r" << setprecision(2)<< "\t\t\r" << i*step;
 			cout << flush;
@@ -287,9 +288,9 @@ void treeCut(){
 	TCanvas *c[nHist];	
 	TProfile *prof[10];
 
-	
 	TH1F* h_1d[5] = {ptA, mH, ggptH, VHptH, Vmass};
 	TH2F* h_2d[10] = {ptbhighptA,ptblowptA,dRbbptA,dRAAptH30,dRAAptH15,ptAhighptH30,ptAlowptH30,ptAhighptH15,ptAlowptH15,ptVptH};
+	
 	for(int i=0;i<nHist;++i){
 		c[i] = new TCanvas(Form("c%d",i));
 		c[i]->cd();
@@ -301,5 +302,12 @@ void treeCut(){
 		}
 		if(i>=10) h_1d[i-10]->Draw();	
 	}
-
+	//draw line at dR(bb) = .8
+	c[2]->cd();
+	TLine *l = new TLine(0,.8,120,.8);
+	//TLine *l = new TLine(c[2]->GetUxmin(),.8,c[2]->GetUxmax(),.8);
+	l->SetLineColor(1);
+	l->Draw("same");
+	c[2]->Modified();
+	c[2]->Update();
 }
