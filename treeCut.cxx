@@ -25,21 +25,24 @@ void treeCut(){
 	//TFile *f = new TFile("SUSYGluGluToHToAA_AToBB_AToTauTau_M-30_TuneCUETP8M1_13TeV_madgraph_pythia8/BBTauTau_0001.root");
 	//TTree* tree = (TTree*)f->Get("Events");
 
-	TH2F* ptbhighptA = new TH2F("ptbhighptA","pt(b) high vs pt(A)",100,0,100,100,0,100);
-	TH2F* ptblowptA = new TH2F("ptblowptA","pt(b) low vs pt(A)",100,0,100,100,0,100);	
-	TH2F* dRbbptA = new TH2F("dRbbpta","dR(bb) vs pt(A)",120,0,120,120,0,3);
-	TH1F* ptA = new TH1F("ptA","pt(A)",200,0,200);	
-	TH2F* dRAAptH30 = new TH2F("dRAAptH30","dR(AA) vs pt(H) mA=30GeV",200,0,300,120,0,5);
-	TH2F* dRAAptH15 = new TH2F("dRAAptH15","dR(AA) vs pt(H) mA=15GeV",200,0,300,120,0,5);
-	TH2F* ptAhighptH30 =new TH2F("ptAhighptH30","pt(A) high vs pt(H) mA=30GeV",200,0,300,200,0,200); 
-	TH2F* ptAlowptH30 = new TH2F("ptAlowptH30","pt(A) low vs pt(H) mA=30GeV",200,0,300,200,0,200);
-	TH2F* ptAhighptH15 =new TH2F("ptAhighptH15","pt(A) high vs pt(H) mA=15GeV",200,0,300,200,0,200); 
-	TH2F* ptAlowptH15 = new TH2F("ptAlowptH15","pt(A) low vs pt(H) mA=15GeV",200,0,300,200,0,200);
+	TH2F* ptbhighpta = new TH2F("ptbhighpta","pt(b) high vs pt(a)",100,0,100,100,0,100);
+	TH2F* ptblowpta = new TH2F("ptblowpta","pt(b) low vs pt(a)",100,0,100,100,0,100);	
+	TH2F* dRbbpta = new TH2F("dRbbpta","dR(bb) vs pt(a)",120,0,120,120,0,3);
+	TH2F* dRaaptH30 = new TH2F("dRaaptH30","dR(aa) vs pt(H) ma=30GeV",200,0,300,120,0,5);
+	TH2F* dRaaptH15 = new TH2F("dRaaptH15","dR(aa) vs pt(H) ma=15GeV",200,0,300,120,0,5);
+	TH2F* ptahighptH30 =new TH2F("ptahighptH30","pt(a) high vs pt(H) ma=30GeV",200,0,300,200,0,200); 
+	TH2F* ptalowptH30 = new TH2F("ptalowptH30","pt(a) low vs pt(H) ma=30GeV",200,0,300,200,0,200);
+	TH2F* ptahighptH15 =new TH2F("ptahighptH15","pt(a) high vs pt(H) ma=15GeV",200,0,300,200,0,200); 
+	TH2F* ptalowptH15 = new TH2F("ptalowptH15","pt(a) low vs pt(H) ma=15GeV",200,0,300,200,0,200);
 	TH2F* ptVptH = new TH2F("ptVptH","pt(V) vs pt(H)",150,0,300,150,0,300);
 	TH1F* mH = new TH1F("mH","Higgs mass",300,123.5,126.5);
 	TH1F* ggptH = new TH1F("ggptH","pt(H) from gg",300,0,300);
 	TH1F* VHptH = new TH1F("VHptH","pt(H) from VH",300,0,300);
 	TH1F* Vmass = new TH1F("Vmass","VB mass",200,50,150);
+	TH1F* pta = new TH1F("pta","pt(a)",200,0,200);	
+	TH1F* VHpta = new TH1F("VHpta","VH pt(a), ma = 15GeV",300,0,300);
+	TH1F* ggpta = new TH1F("ggpta","gg pt(a), ma = 30GeV",300,0,300);
+
 
 
 	TChain *chain = new TChain("Events");
@@ -84,16 +87,16 @@ void treeCut(){
 		
 		bool gluonFusion = false;
 		bool vectorHiggs = false;
-		bool foundAA = false;
-		bool foundAbb = false;
-		unsigned int a_index[2] = {0};//index of A particles go here
-		unsigned int b_index[2] = {0};//index of b particles (from A-bb) go here
+		bool foundaa = false;
+		bool foundabb = false;
+		unsigned int a_index[2] = {0};//index of a particles go here
+		unsigned int b_index[2] = {0};//index of b particles (from a-bb) go here
 		int H_index = -1;
 		int aMother_index = -1;
 		double H_pt = -1;
 		float H_mass = 0;
 		double aMother_pt = -1;
-		float dRAA = -1.0;
+		float dRaa = -1.0;
 		float dRbb = -1.0;
 		int vectorBoson_index = -1;		
 		double vectorBoson_pt = -1.0;
@@ -106,34 +109,34 @@ void treeCut(){
 		
 
 
-		for(unsigned int j=0; j< nGenPart; j++){ //LOOP OVER PARTICLES
+		for(unsigned int j=0; j< nGenPart; j++){ //LOOP OVER PaRTICLES
 				
 
 
 			//FOR GLUON GLUON
 			//check event starts with 21,21
-			//look for A (36) ->bb (+-5),tau tau (+-15) /mu mu (+-13)
+			//look for a (36) ->bb (+-5),tau tau (+-15) /mu mu (+-13)
 			//125GeV Higgs (25)
-			//'A' mass is 30
+			//'a' mass is 30
 			if(gluonFusion)	{
-				//Get index of As
+				//Get index of as
 				if(GenPart_pdgId[j] == 36){
 					if(a_index[0]==0) a_index[0] = j;
 					else if(a_index[1]==0){
 						 a_index[1] = j;
-						foundAA = true;
+						foundaa = true;
 					}
-					else throw std::runtime_error( "Error more than 2A in single event" );				
+					else throw std::runtime_error( "Error more than 2a in single event" );				
 				}
-				//Look for A-bb
-				//This won't work if AA->4b
+				//Look for a-bb
+				//This won't work if aa->4b
 				if(abs(GenPart_pdgId[j]) == 5 && GenPart_pdgId[GenPart_genPartIdxMother[j]] == 36){
 					if(b_index[0] ==0) b_index[0] = j;
 					else if(b_index[1] == 0){
 						b_index[1] = j;
-						foundAbb = true;
+						foundabb = true;
 					}
-					else throw std::runtime_error("Multiple A->bb decays in one event");
+					else throw std::runtime_error("Multiple a->bb decays in one event");
 				}							
 			}
 	
@@ -141,16 +144,16 @@ void treeCut(){
 			//check event starts with 2 quarks (1-6)
 			//look for a(25) -> tau tau (+-15)
 			//125GeV Higgs (35)
-			//'A' mass is 15GeV
+			//'a' mass is 15GeV
 			if(vectorHiggs){
-				//Get index of As
+				//Get index of as
 				if(GenPart_pdgId[j] == 25){
 					if(a_index[0]==0) a_index[0] = j;
 					else if(a_index[1]==0){
 						a_index[1] = j;
-						foundAA = true;
+						foundaa = true;
 					}	
-					else throw std::runtime_error("Error more than 2A in single event");
+					else throw std::runtime_error("Error more than 2a in single event");
 				}
 				//Get index of last W or Z (23,+-24)
 				if(abs(GenPart_pdgId[j]) == 24 || GenPart_pdgId[j]==23){
@@ -161,8 +164,8 @@ void treeCut(){
 		}
 			
 			
-		//fill all A-dependent plots in here
-		if(foundAA){
+		//fill all a-dependent plots in here
+		if(foundaa){
 			//Get index of mama H, making sure it's H
 			if(GenPart_genPartIdxMother[a_index[0]] == GenPart_genPartIdxMother[a_index[1]]){
 				if(gluonFusion && GenPart_pdgId[GenPart_genPartIdxMother[a_index[0]]]==25) H_index = GenPart_genPartIdxMother[a_index[0]];
@@ -170,49 +173,50 @@ void treeCut(){
 				
 				else{		
 					cout << GenPart_genPartIdxMother[a_index[0]] << endl; 
-					throw std::runtime_error("A mother not Higgs");
+					throw std::runtime_error("a mother not Higgs");
 				}
 			}
-			else throw std::runtime_error("A parents don't match ");
+			else throw std::runtime_error("a parents don't match ");
 			
 
 	
 					
-			//Get index of mama A
+			//Get index of mama a
 			if(GenPart_genPartIdxMother[b_index[0]] == GenPart_genPartIdxMother[b_index[1]]) aMother_index = GenPart_genPartIdxMother[b_index[0]];
 			else throw std::runtime_error("bb parents don't match");
 
 			H_pt = GenPart_pt[H_index];				
 			H_mass = GenPart_mass[H_index];
-			dRAA = dR(GenPart_eta[a_index[0]],GenPart_phi[a_index[0]],GenPart_eta[a_index[1]],GenPart_phi[a_index[1]]);
+			dRaa = dR(GenPart_eta[a_index[0]],GenPart_phi[a_index[0]],GenPart_eta[a_index[1]],GenPart_phi[a_index[1]]);
 			
 			mH->Fill(H_mass);
 
 			
 		
-			//fill pt(A) with both As
-			ptA->Fill(GenPart_pt[a_index[0]]);
-			ptA->Fill(GenPart_pt[a_index[1]]);
-					aMother_pt = GenPart_pt[aMother_index];
+			//fill pt(a) with both as
+			pta->Fill(GenPart_pt[a_index[0]]);
+			pta->Fill(GenPart_pt[a_index[1]]);
+			aMother_pt = GenPart_pt[aMother_index];
 			
-			//Fill gluon fusion-specific plots (mA = 30 GeV)
+			//Fill gluon fusion-specific plots (ma = 30 GeV)
 			if(gluonFusion){
 				ggptH->Fill(H_pt);
 				if(GenPart_pt[a_index[0]] >= GenPart_pt[a_index[1]]){
-					ptAhighptH30->Fill(H_pt,GenPart_pt[a_index[0]]);
-					ptAlowptH30->Fill(H_pt,GenPart_pt[a_index[1]]);
+					ptahighptH30->Fill(H_pt,GenPart_pt[a_index[0]]);
+					ptalowptH30->Fill(H_pt,GenPart_pt[a_index[1]]);
 				}
 				else{
-					ptAhighptH30->Fill(H_pt,GenPart_pt[a_index[1]]);
-					ptAlowptH30->Fill(H_pt,GenPart_pt[a_index[0]]);
+					ptahighptH30->Fill(H_pt,GenPart_pt[a_index[1]]);
+					ptalowptH30->Fill(H_pt,GenPart_pt[a_index[0]]);
 				}
-				dRAAptH30->Fill(H_pt,dRAA);
-				
+				dRaaptH30->Fill(H_pt,dRaa);		
+				ggpta->Fill(GenPart_pt[a_index[0]]);
+				ggpta->Fill(GenPart_pt[a_index[1]]);
 
 			}
 
 
-			//Fill VH-specific plots (mA = 15GeV)		
+			//Fill VH-specific plots (ma = 15GeV)		
 			if(vectorHiggs){
 				if (vectorBoson_index==-1) throw std::runtime_error("Vector boson not found in VB event");
 				vectorBoson_pt = GenPart_pt[vectorBoson_index];
@@ -221,33 +225,35 @@ void treeCut(){
 				Vmass->Fill(GenPart_mass[vectorBoson_index]);
 				
 				if(GenPart_pt[a_index[0]] >= GenPart_pt[a_index[1]]){
-					ptAhighptH15->Fill(H_pt,GenPart_pt[a_index[0]]);
-					ptAlowptH15->Fill(H_pt,GenPart_pt[a_index[1]]);
+					ptahighptH15->Fill(H_pt,GenPart_pt[a_index[0]]);
+					ptalowptH15->Fill(H_pt,GenPart_pt[a_index[1]]);
 				}
 				else{
-					ptAhighptH15->Fill(H_pt,GenPart_pt[a_index[1]]);
-					ptAlowptH15->Fill(H_pt,GenPart_pt[a_index[0]]);
+					ptahighptH15->Fill(H_pt,GenPart_pt[a_index[1]]);
+					ptalowptH15->Fill(H_pt,GenPart_pt[a_index[0]]);
 				}
-				dRAAptH15->Fill(H_pt,dRAA);
+				dRaaptH15->Fill(H_pt,dRaa);
+				VHpta->Fill(GenPart_pt[a_index[0]]);
+				pta->Fill(GenPart_pt[a_index[1]]);
 			}
 
-			//Fill A->bb histograms
-			if(foundAbb){
-				if(vectorHiggs)  throw std::runtime_error("There was a VH A->bb event (vb data incompatable since  mA=15 not mA=30)");
+			//Fill a->bb histograms
+			if(foundabb){
+				if(vectorHiggs)  throw std::runtime_error("There was a VH a->bb event (vb data incompatable since  ma=15 not ma=30)");
 				dRbb = dR(GenPart_eta[b_index[0]],GenPart_phi[b_index[0]],GenPart_eta[b_index[1]],GenPart_phi[b_index[1]]);
-				dRbbptA->Fill(aMother_pt,dRbb);
+				dRbbpta->Fill(aMother_pt,dRbb);
 				if(GenPart_pt[b_index[0]] >= GenPart_pt[b_index[1]]){
-					ptbhighptA->Fill(aMother_pt,GenPart_pt[b_index[0]]);
-					ptblowptA->Fill(aMother_pt,GenPart_pt[b_index[1]]);
+					ptbhighpta->Fill(aMother_pt,GenPart_pt[b_index[0]]);
+					ptblowpta->Fill(aMother_pt,GenPart_pt[b_index[1]]);
 				}
 				else{
-					ptbhighptA->Fill(aMother_pt,GenPart_pt[b_index[1]]);
-					ptblowptA->Fill(aMother_pt,GenPart_pt[b_index[0]]);
+					ptbhighpta->Fill(aMother_pt,GenPart_pt[b_index[1]]);
+					ptblowpta->Fill(aMother_pt,GenPart_pt[b_index[0]]);
 				}
 			}
 
 		}
-		else throw std::runtime_error("Event missing AA");
+		else throw std::runtime_error("Event missing aa");
 
 
 
@@ -261,35 +267,35 @@ void treeCut(){
 	}	
 
 	//manually set axes titles (ugh)
-	ptAhighptH30->GetXaxis()->SetTitle("pt(H)");
-	ptAhighptH30->GetYaxis()->SetTitle("pt(A)");
-	ptAlowptH30->GetXaxis()->SetTitle("pt(H)");
-	ptAlowptH30->GetYaxis()->SetTitle("pt(A)");
-	ptAhighptH15->GetXaxis()->SetTitle("pt(H)");
-	ptAhighptH15->GetYaxis()->SetTitle("pt(A)");
-	ptAlowptH15->GetXaxis()->SetTitle("pt(H)");
-	ptAlowptH15->GetYaxis()->SetTitle("pt(A)");
-	dRAAptH15->GetXaxis()->SetTitle("pt(H)");
-	dRAAptH15->GetYaxis()->SetTitle("dR(AA)");
-	dRAAptH30->GetXaxis()->SetTitle("pt(H)");
-	dRAAptH30->GetYaxis()->SetTitle("dR(AA)");
-	dRbbptA->GetXaxis()->SetTitle("pt(A)");
-	dRbbptA->GetYaxis()->SetTitle("dR(bb)");
-	ptbhighptA->GetXaxis()->SetTitle("pt(A)");
-	ptbhighptA->GetYaxis()->SetTitle("pt(b)");
-	ptblowptA->GetXaxis()->SetTitle("pt(A)");
-	ptblowptA->GetYaxis()->SetTitle("pt(b)");
+	ptahighptH30->GetXaxis()->SetTitle("pt(H)");
+	ptahighptH30->GetYaxis()->SetTitle("pt(a)");
+	ptalowptH30->GetXaxis()->SetTitle("pt(H)");
+	ptalowptH30->GetYaxis()->SetTitle("pt(a)");
+	ptahighptH15->GetXaxis()->SetTitle("pt(H)");
+	ptahighptH15->GetYaxis()->SetTitle("pt(a)");
+	ptalowptH15->GetXaxis()->SetTitle("pt(H)");
+	ptalowptH15->GetYaxis()->SetTitle("pt(a)");
+	dRaaptH15->GetXaxis()->SetTitle("pt(H)");
+	dRaaptH15->GetYaxis()->SetTitle("dR(aa)");
+	dRaaptH30->GetXaxis()->SetTitle("pt(H)");
+	dRaaptH30->GetYaxis()->SetTitle("dR(aa)");
+	dRbbpta->GetXaxis()->SetTitle("pt(a)");
+	dRbbpta->GetYaxis()->SetTitle("dR(bb)");
+	ptbhighpta->GetXaxis()->SetTitle("pt(a)");
+	ptbhighpta->GetYaxis()->SetTitle("pt(b)");
+	ptblowpta->GetXaxis()->SetTitle("pt(a)");
+	ptblowpta->GetYaxis()->SetTitle("pt(b)");
 	ptVptH->GetXaxis()->SetTitle("pt(H)");
 	ptVptH->GetYaxis()->SetTitle("pt(V)");	
 	
 
-	int nHist = 15; //Make canvases
+	int nHist = 17; //Make canvases
 	
 	TCanvas *c[nHist];	
 	TProfile *prof[10];
 
-	TH1F* h_1d[5] = {ptA, mH, ggptH, VHptH, Vmass};
-	TH2F* h_2d[10] = {ptbhighptA,ptblowptA,dRbbptA,dRAAptH30,dRAAptH15,ptAhighptH30,ptAlowptH30,ptAhighptH15,ptAlowptH15,ptVptH};
+	TH1F* h_1d[7] = {pta, mH, ggptH, VHptH, Vmass, VHpta, ggpta};
+	TH2F* h_2d[10] = {ptbhighpta,ptblowpta,dRbbpta,dRaaptH30,dRaaptH15,ptahighptH30,ptalowptH30,ptahighptH15,ptalowptH15,ptVptH};
 	
 	for(int i=0;i<nHist;++i){
 		c[i] = new TCanvas(Form("c%d",i));
